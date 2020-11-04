@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pl" xmlns:th="thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Wypożyczalnia aut</title>
+
+    <style>
+        .odd {
+            background-color: darkolivegreen;
+        }
+
+        .even {
+            background-color: darkkhaki;
+        }
+
+    </style>
+</head>
+<body>
+<div th:replace="fragments/navigation :: navigation"></div>
+<a th:href="@{/mvc/car/add}">Dodaj nowy samochód</a>
+
+<form method="post" th:action="@{/mvc/car/search}" th:object="${params}">
+
+    Producent: <input type="text" th:field="*{manufacturer}"/></br>
+    Model: <input type="text" th:field="*{model}"/></br>
+    Produkcja od: <input type="text" th:field="*{productionFrom}"/></br>
+    Produkcja do: <input type="text" th:field="*{productionTo}"/></br>
+    Vin: <input type="text" th:field="*{vin}"/></br>
+
+    <input type="submit" value="Filtruj"/>
+
+</form>
+
+<h4 th:if="${#lists.isEmpty(cars)}">Brak samochodow w wypozyczalni</h4>
+
+
+<table th:if="${cars.size() > 0}">
+    <thead>
+    <tr>
+        <td>Producent</td>
+        <td>Model</td>
+        <td>Kraj produkcji</td>
+        <td>Vin</td>
+        <td>Rok produkcji</td>
+        <td>Ubezpieczenie od</td>
+        <td>Ubezpieczenie do</td>
+        <td>Akcja</td>
+        <td></td>
+        <td></td>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="car, iterStat : ${cars}" th:class="${iterStat.isOdd()}? 'odd': 'even'">
+        <td><span th:text="${car.manufacturer}"/></td>
+        <td><span th:text="${car.model}"/></td>
+        <td>
+            <div th:switch="${car.manufacturer}">
+                <span th:case="Opel">Niemcy</span>
+                <span th:case="Fiat">Włochy</span>
+                <span th:case="Vw">Niemcy</span>
+                <span th:case="Ford">USA</span>
+                <span th:case="*">Brak informacji</span>
+            </div>
+        </td>
+        <td><span th:text="${car.vin}"/></td>
+        <td><span th:text="${car.yearOfProduction}"/></td>
+        <td><span th:text="${car.insuredFrom}"/></td>
+        <td><span th:text="${car.insuredTo}"/></td>
+        <td>
+            <span th:if="${todayDate.isAfter(car.insuredTo)}">Brak ubezpieczenia</span>
+            <span th:unless="${todayDate.isAfter(car.insuredTo)}">Brak potrzebnych akcji</span>
+        </td>
+        <td>
+            <a th:href="@{/mvc/car/edit/} + ${car.id}">Edytuj</a>
+        </td>
+        <td>
+            <a th:href="@{/mvc/car/delete/} + ${car.id}">usuń</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<div th:replace="fragments/navigation :: footer"></div>
+</body>
+</html>
